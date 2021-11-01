@@ -11,6 +11,9 @@ public class PlayerHandler : MonoBehaviour
     private const float accuracy = 0.5f;
     private bool isFertilizing;
 
+    // ENCAPSULATION
+    public GameObject ObjectCollided { get; private set; } 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,17 +38,38 @@ public class PlayerHandler : MonoBehaviour
         }
     }
 
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        //save last plant collided
+        if (collider.tag.Equals("Plant"))
+        {
+            ObjectCollided = collider.gameObject;
+        }
+    }
+
+    private void OnTriggerExit(Collider collider)
+    {
+        //save last plant collided
+        if (collider.tag.Equals("Plant"))
+        {
+            ObjectCollided = null;
+        }
+    }
+
     // ENCAPSULATION of the variable newPosition
     public void MoveToPosition(Vector3 position) {
         newPosition = position;
     }
 
-    public void Fetrilize() {
+    public void Fetrilize(Plant plant) {
         if (!isFertilizing)
         {
             isFertilizing = true;
             anim.SetBool("Crouch_b", isFertilizing);
             Invoke("StopFertilize", 1f);
+
+            plant.Fertilize();
         }
     }
 
@@ -53,4 +77,6 @@ public class PlayerHandler : MonoBehaviour
         isFertilizing = false;
         anim.SetBool("Crouch_b", isFertilizing);
     }
+
+
 }

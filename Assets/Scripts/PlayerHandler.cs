@@ -10,6 +10,10 @@ public class PlayerHandler : MonoBehaviour
     private Vector3 newPosition;
     private const float accuracy = 0.5f;
     private bool isFertilizing;
+    private Plant plantToFertilize;
+
+
+    private const float bound= 20;
 
     // ENCAPSULATION
     public GameObject ObjectCollided { get; private set; } 
@@ -23,7 +27,11 @@ public class PlayerHandler : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    { 
+    {
+        //check
+        CheckBounderies();
+
+        //move
         Vector3 direction = newPosition - this.transform.position;
         if (direction.magnitude > accuracy)
         {
@@ -35,6 +43,10 @@ public class PlayerHandler : MonoBehaviour
         else if (anim.GetFloat("Speed_f") > 0f)
         {
             anim.SetFloat("Speed_f", 0f);
+            if (plantToFertilize!=null)
+            {
+                Fetrilize(plantToFertilize);
+            }
         }
     }
 
@@ -57,13 +69,49 @@ public class PlayerHandler : MonoBehaviour
         }
     }
 
-    // ENCAPSULATION of the variable newPosition
+    //ABSTRACTION
+    private void CheckBounderies() {
+
+        //vertical bounderies
+        if (this.transform.position.z < -bound)
+        {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y,-bound);
+            newPosition = this.transform.position;
+        }
+        if (this.transform.position.z > bound)
+        {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, bound);
+            newPosition = this.transform.position;
+        }
+
+        //horizontal bounderies
+        if (this.transform.position.x < -bound)
+        {
+            this.transform.position = new Vector3(-bound, this.transform.position.y, this.transform.position.z); 
+            newPosition = this.transform.position;
+        } 
+        if (this.transform.position.x > bound)
+        {
+            this.transform.position = new Vector3(bound, this.transform.position.y, this.transform.position.z);
+            newPosition = this.transform.position;
+        }
+    }
+
+
+    //ENCAPSULATION
     public void MoveToPosition(Vector3 position) {
+        plantToFertilize = null;
+        newPosition = position;
+    }
+
+    //ENCAPSULATION AND OVERLOAD
+    public void MoveToPosition(Vector3 position, Plant plant) {
+        plantToFertilize = plant;
         newPosition = position;
     }
 
     public void Fetrilize(Plant plant) {
-        if (!isFertilizing)
+        if (!isFertilizing && plant.state.Equals(Plant.State.NEED_FERTILIZER))
         {
             isFertilizing = true;
             anim.SetBool("Crouch_b", isFertilizing);
@@ -75,8 +123,7 @@ public class PlayerHandler : MonoBehaviour
 
     public void StopFertilize() {
         isFertilizing = false;
+        plantToFertilize = null;
         anim.SetBool("Crouch_b", isFertilizing);
     }
-
-
 }

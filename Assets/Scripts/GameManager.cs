@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     //inspector set
-    [SerializeField] private List<Crop> cropList;
+    private List<Crop> cropList = new List<Crop>();
 
     private PlayerHandler playerHandler;
     private GameObject[] prefabsPlant;
@@ -18,14 +18,23 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         //set player
-        playerHandler = GameObject.Find("Player").GetComponent<PlayerHandler>();
+        playerHandler = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHandler>();
 
         //set prefabs
         prefabsPlant = Resources.LoadAll<GameObject>("Prefabs/Plant");
 
         //set layer mask
         groundLayer = LayerMask.NameToLayer("Ground");
-      
+
+        //set crop list
+        GameObject[] cropArrObj = GameObject.FindGameObjectsWithTag("Crop");
+        for (int i=0; i<cropArrObj.Length; i++)
+        {
+            GameObject obj = cropArrObj[i];
+            obj.name = "Crop_" + i;
+            cropList.Add(obj.GetComponent<Crop>());
+        }
+
         //set crop index list
         InitializeCropIndexList();
 
@@ -42,35 +51,39 @@ public class GameManager : MonoBehaviour
         }
         else if (Input.GetMouseButton(1))
         {
-            TryToFertilize(Camera.main.ScreenPointToRay(Input.mousePosition));
+            MoveToPositionAndFertilize(Camera.main.ScreenPointToRay(Input.mousePosition));
         }
     }
 
 
     private IEnumerator AddPlantToRandomCrop()
     {
-        yield return new WaitForSeconds(1);
+        while (true) {
+            yield return new WaitForSeconds(1);
 
-        //check if can spawn more plants
-        if (plantlessCropIndexList.Count <= 0)
-        {
-            StopCoroutine(AddPlantToRandomCrop());
+            //choose random plantless crop index
+            int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
+            Debug.Log("randomCropPositionIndex: " + randomCropPositionIndex);
+            Debug.Log("crop: " + cropList[plantlessCropIndexList[randomCropPositionIndex]].name);
+
+            //set random plant to crop
+            int randomPlantType = Random.Range(0, 3);
+            randomPlantType = 0; //TODO remove this line
+            Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
+            Plant plant = GetPlantByType(randomPlantType, cropPosition);
+            plant.Rename(plantedCropIndexList.Count);
+            cropList[plantlessCropIndexList[randomCropPositionIndex]].SetPlant(plant);
+
+            //update index list
+            plantedCropIndexList.Add(plantlessCropIndexList[randomCropPositionIndex]);
+            plantlessCropIndexList.Remove(randomCropPositionIndex);
+
+            //check if can spawn more plants
+            if (plantlessCropIndexList.Count <= 0)
+            {
+                StopCoroutine(AddPlantToRandomCrop());
+            }
         }
-
-        //choose random plantless crop index
-        int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
-
-        //set random plant to crop
-        int randomPlantType = Random.Range(0, 3);
-        randomPlantType = 0; //TODO remove this line
-        Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
-        Plant plant = GetPlantByType(randomPlantType, cropPosition);
-        plant.Rename(randomCropPositionIndex);
-        cropList[plantlessCropIndexList[randomCropPositionIndex]].SetPlant(plant);
-
-        //update index list
-        plantedCropIndexList.Add(plantlessCropIndexList[randomCropPositionIndex]);
-        plantlessCropIndexList.Remove(randomCropPositionIndex);
     }
 
     //ABSTRACTION
@@ -79,7 +92,7 @@ public class GameManager : MonoBehaviour
         plantlessCropIndexList = new List<int>();
         for (int i = 0; i < cropList.Count; i++)
         {
-            plantlessCropIndexList.Add(0);
+            plantlessCropIndexList.Add(i);
         }
     }
 
@@ -87,6 +100,7 @@ public class GameManager : MonoBehaviour
     private Plant GetPlantByType(int type, Transform transform)
     {
         GameObject plant = Instantiate(prefabsPlant[type], transform, true);
+        plant.transform.localPosition = Vector3.zero;
         return plant.GetComponent<Plant>();
     }
 
@@ -103,7 +117,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void TryToFertilize(Ray raycast) {
+    //ABSTRACTION
+    private void MoveToPositionAndFertilize(Ray raycast) {
         RaycastHit raycastHit;
         if (Physics.Raycast(raycast, out raycastHit))
         {
@@ -111,10 +126,15 @@ public class GameManager : MonoBehaviour
             if (obj.tag.Equals("Plant"))
             {
                 int index = int.Parse(obj.name.Substring(obj.name.IndexOf("_")+1));
+                Plant plant = cropList[index].GetPlant();
                 if (playerHandler.ObjectCollided != null && playerHandler.ObjectCollided.name.EndsWith("_" + index))
                 {
-                    Plant plant = cropList[index].GetPlant();
+                    //if already near plant, just ferilize
                     playerHandler.Fetrilize(plant);
+                }
+                else {
+                    //go to plant, then fertilize
+                    playerHandler.MoveToPosition(raycastHit.point, plant);
                 }
             }
         }

@@ -8,7 +8,6 @@ public class Flower : Plant
     public override void Rename(int index)
     {
         this.gameObject.name = "Flower_" +index;
-     
     }
 
 }

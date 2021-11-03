@@ -115,9 +115,8 @@ public class PlayerHandler : MonoBehaviour
         {
             isFertilizing = true;
             anim.SetBool("Crouch_b", isFertilizing);
-            Invoke("StopFertilize", 1f);
-
             plant.Fertilize();
+            Invoke("StopFertilize", 1f);
         }
     }
 

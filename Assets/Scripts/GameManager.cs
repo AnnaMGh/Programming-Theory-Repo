@@ -61,27 +61,30 @@ public class GameManager : MonoBehaviour
         while (true) {
             yield return new WaitForSeconds(1);
 
-            //choose random plantless crop index
-            int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
-            Debug.Log("randomCropPositionIndex: " + randomCropPositionIndex);
-            Debug.Log("crop: " + cropList[plantlessCropIndexList[randomCropPositionIndex]].name);
-
-            //set random plant to crop
-            int randomPlantType = Random.Range(0, 3);
-            randomPlantType = 0; //TODO remove this line
-            Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
-            Plant plant = GetPlantByType(randomPlantType, cropPosition);
-            plant.Rename(plantedCropIndexList.Count);
-            cropList[plantlessCropIndexList[randomCropPositionIndex]].SetPlant(plant);
-
-            //update index list
-            plantedCropIndexList.Add(plantlessCropIndexList[randomCropPositionIndex]);
-            plantlessCropIndexList.Remove(randomCropPositionIndex);
-
             //check if can spawn more plants
             if (plantlessCropIndexList.Count <= 0)
             {
                 StopCoroutine(AddPlantToRandomCrop());
+            }
+            else
+            {
+                //choose random plantless crop index
+                int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
+                Debug.Log("plantlessCropIndexList: " + plantlessCropIndexList.ListToString());
+                Debug.Log("randomCropPositionIndex: " + randomCropPositionIndex);
+                Debug.Log("crop: " + cropList[plantlessCropIndexList[randomCropPositionIndex]].name);
+
+                //set random plant to crop
+                int randomPlantType = Random.Range(0, 3);
+                randomPlantType = 0; //TODO remove this line
+                Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
+                Plant plant = GetPlantByType(randomPlantType, cropPosition);
+                plant.Rename(plantlessCropIndexList[randomCropPositionIndex]);
+                cropList[plantlessCropIndexList[randomCropPositionIndex]].SetPlant(plant);
+
+                //update index list
+                plantedCropIndexList.Add(plantlessCropIndexList[randomCropPositionIndex]);
+                plantlessCropIndexList.RemoveAt(randomCropPositionIndex);
             }
         }
     }
@@ -139,4 +142,21 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+}
+static class Extension
+{
+    public static string ListToString(this List<int> list)
+    {
+        string str = "";
+        foreach (int i in list)
+        {
+            str += i + ",";
+        }
+        if (str.Length > 0)
+        {
+            str = str.Substring(0, str.Length - 2);
+        }
+        return str;
+    }
+
 }

@@ -59,7 +59,8 @@ public class GameManager : MonoBehaviour
     private IEnumerator AddPlantToRandomCrop()
     {
         while (true) {
-            yield return new WaitForSeconds(1);
+            float waitSeconds = Random.Range(2f, 5f);
+            yield return new WaitForSeconds(waitSeconds);
 
             //check if can spawn more plants
             if (plantlessCropIndexList.Count <= 0)
@@ -70,13 +71,9 @@ public class GameManager : MonoBehaviour
             {
                 //choose random plantless crop index
                 int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
-                Debug.Log("plantlessCropIndexList: " + plantlessCropIndexList.ListToString());
-                Debug.Log("randomCropPositionIndex: " + randomCropPositionIndex);
-                Debug.Log("crop: " + cropList[plantlessCropIndexList[randomCropPositionIndex]].name);
-
+              
                 //set random plant to crop
                 int randomPlantType = Random.Range(0, 3);
-                randomPlantType = 0; //TODO remove this line
                 Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
                 Plant plant = GetPlantByType(randomPlantType, cropPosition);
                 plant.Rename(plantlessCropIndexList[randomCropPositionIndex]);
@@ -126,18 +123,22 @@ public class GameManager : MonoBehaviour
         if (Physics.Raycast(raycast, out raycastHit))
         {
             GameObject obj = raycastHit.collider.gameObject;
-            if (obj.tag.Equals("Plant"))
+            if (obj.tag.Equals("Plant") || obj.tag.Equals("Crop"))
             {
                 int index = int.Parse(obj.name.Substring(obj.name.IndexOf("_")+1));
                 Plant plant = cropList[index].GetPlant();
-                if (playerHandler.ObjectCollided != null && playerHandler.ObjectCollided.name.EndsWith("_" + index))
+                if (plant != null)
                 {
-                    //if already near plant, just ferilize
-                    playerHandler.Fetrilize(plant);
-                }
-                else {
-                    //go to plant, then fertilize
-                    playerHandler.MoveToPosition(raycastHit.point, plant);
+                    if (playerHandler.ObjectCollided != null && playerHandler.ObjectCollided.name.EndsWith("_" + index))
+                    {
+                        //if already near plant, just ferilize
+                        playerHandler.Fetrilize(plant);
+                    }
+                    else
+                    {
+                        //go to plant, then fertilize
+                        playerHandler.MoveToPosition(raycastHit.point, plant);
+                    }
                 }
             }
         }

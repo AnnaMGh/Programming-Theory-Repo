@@ -2,22 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tree : Plant
+public class Tree : Plant // INHERITANCE
 {
+    //ABSTRACTION
     public override void Rename(int index)
     {
-        throw new System.NotImplementedException();
+        this.gameObject.name = "Tree_" + index;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    //POLYMORPHISM
+    protected override void SetStateColor()
     {
-        
+        stateColor = new Color[3] { Color.white, 
+            new Color(0.5f, 0.3f, 0.2f), 
+            new Color(0.1f, 0.1f, 0.1f) };
     }
 
-    // Update is called once per frame
-    void Update()
+    //POLYMORPHISM
+    protected override void SetFertilizerNeed()
     {
-        
+        base.sliderHandler.SetSlider(0, 3);
     }
 }

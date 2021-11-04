@@ -10,23 +10,23 @@ public abstract class Plant : MonoBehaviour
     public int fertilizerNeed { get; protected set; }
     public int fertilizerCount { get; protected set; }
     public State state { get; protected set; }
-    public Color[] stateColor
-    {
-        get { return new Color[3] { Color.green, Color.yellow, Color.black }; }
-        protected set { }
-    }
+    public Color[] stateColor { get; protected set; }
 
+    protected SliderHandler sliderHandler;
     private Renderer objRenderer;
     private float stateLength;
 
 
     public void Awake()
     {
-        state = State.HEALTHY;
+        GameObject sliderObj = this.gameObject.transform.GetChild(0).GetChild(0).gameObject;
+        sliderHandler = sliderObj.GetComponent<SliderHandler>();
         objRenderer = this.GetComponent<Renderer>();
-        objRenderer.material.color = stateColor[(int)state];
         stateLength = System.Enum.GetNames(typeof(State)).Length;
-        StartCoroutine(StartLife());
+
+        SetStateColor();
+        SetFertilizerNeed();
+        ChangeState((int)State.HEALTHY);
     }
 
 
@@ -34,14 +34,20 @@ public abstract class Plant : MonoBehaviour
     {
         while (true)
         {
-            float sec = Random.Range(5, 10);
+            float sec = Random.Range(10, 15);
             yield return new WaitForSeconds(sec);
             int stateIndex = (int)state;
-            if (stateIndex < stateLength-1)
+            if (stateIndex < stateLength - 1)
             {
                 ChangeState((State)(stateIndex + 1));
             }
         }
+    }
+
+    protected IEnumerator ShowSlider(bool enable, float sec)
+    {
+        yield return new WaitForSeconds(sec);
+        sliderHandler.Show(enable);
     }
 
     protected void ChangeState(State newState)
@@ -49,14 +55,16 @@ public abstract class Plant : MonoBehaviour
         this.state = newState;
         objRenderer.material.color = stateColor[(int)state];
 
-        if (this.state.Equals(State.HEALTHY)){
+        if (this.state.Equals(State.HEALTHY))
+        {
             Heal();
         }
         else if (this.state.Equals(State.NEED_FERTILIZER))
         {
             AskForFertilizer();
         }
-        else{
+        else
+        {
             Die();
         }
     }
@@ -65,18 +73,38 @@ public abstract class Plant : MonoBehaviour
     {
         if (state.Equals(State.NEED_FERTILIZER))
         {
-            ChangeState(State.HEALTHY);
+            sliderHandler.SetValue(sliderHandler.GetValue() + 1f);
         }
     }
 
-    public virtual void Heal()
+    protected virtual void SetStateColor()
     {
+        stateColor = new Color[3] { Color.white, Color.yellow, Color.black };
+    }
 
+    protected virtual void SetFertilizerNeed()
+    {
+        sliderHandler.SetSlider(0, 1);
+        sliderHandler.SetDelegate((obj)=> {
+            if (sliderHandler.IsSliderFull())
+            {
+                ChangeState(State.HEALTHY);
+            }
+        });
+        sliderHandler.Show(false);
+    }
+
+    protected virtual void Heal()
+    {
+        StopCoroutine(StartLife());
+        StartCoroutine(ShowSlider(false, 1f));
+        StartCoroutine(StartLife());
     }
 
     public virtual void AskForFertilizer()
     {
-      
+        sliderHandler.SetValue(sliderHandler.GetMinValue());
+        StartCoroutine(ShowSlider(true, 0f));
     }
 
     public virtual void Die()

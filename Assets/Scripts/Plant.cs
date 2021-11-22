@@ -16,6 +16,8 @@ public abstract class Plant : MonoBehaviour
     private Renderer objRenderer;
     private float stateLength;
 
+    private Delegates.ObjectDelegate delegateObj;
+
 
     public void Awake()
     {
@@ -24,8 +26,10 @@ public abstract class Plant : MonoBehaviour
         objRenderer = this.GetComponent<Renderer>();
         stateLength = System.Enum.GetNames(typeof(State)).Length;
 
+        SetDelegate();
         SetStateColor();
         SetFertilizerNeed();
+        StartCoroutine(ShowSlider(false, 0));
         ChangeState((int)State.HEALTHY);
     }
 
@@ -77,6 +81,19 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    private void SetDelegate()
+    {
+
+        delegateObj = (obj) =>
+        {
+            if ((bool)obj && state.Equals(State.NEED_FERTILIZER))
+            {
+                ChangeState(State.HEALTHY);
+            }
+        };
+
+        sliderHandler.SetDelegate(delegateObj);
+    }
     protected virtual void SetStateColor()
     {
         stateColor = new Color[3] { Color.white, Color.yellow, Color.black };
@@ -85,13 +102,14 @@ public abstract class Plant : MonoBehaviour
     protected virtual void SetFertilizerNeed()
     {
         sliderHandler.SetSlider(0, 1);
-        sliderHandler.SetDelegate((obj)=> {
+        sliderHandler.SetDelegate((obj) =>
+        {
             if (sliderHandler.IsSliderFull())
             {
                 ChangeState(State.HEALTHY);
             }
         });
-        sliderHandler.Show(false);
+       
     }
 
     protected virtual void Heal()
@@ -109,6 +127,7 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void Die()
     {
+        sliderHandler.Show(false);
         StopCoroutine(StartLife());
     }
 

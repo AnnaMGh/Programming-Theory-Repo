@@ -10,6 +10,7 @@ public class SliderHandler : MonoBehaviour
     private Image fillImg;
     private float fillToValue;
 
+    private readonly Color bgColor = Color.gray;
     private readonly Color minColor = Color.red;
     private readonly Color midColor = Color.yellow;
     private readonly Color maxColor = Color.green;
@@ -17,7 +18,7 @@ public class SliderHandler : MonoBehaviour
     private bool isSliderValueDoneUpdating;
     private bool isSliderColorDoneUpdating;
 
-    private Deleagates.ObjectDelegate objDelegate;
+    private Delegates.ObjectDelegate objDelegate;
 
 
     // Update is called once per frame
@@ -51,9 +52,9 @@ public class SliderHandler : MonoBehaviour
             }
             else
             {
-                if (objDelegate != null)
+                if (objDelegate != null && IsSliderFull()  && fillToValue>0)
                 {
-                    objDelegate.Invoke(IsSliderFull());
+                    objDelegate.Invoke(true);
                 }
                 isSliderValueDoneUpdating = true;
                 isSliderColorDoneUpdating = false;
@@ -69,17 +70,17 @@ public class SliderHandler : MonoBehaviour
         {
             if (slider.value == slider.minValue)
             {
-                bgImg.color = minColor;
+                bgImg.color = bgColor;
                 fillImg.color = minColor;       
             }
             else if (slider.value < slider.maxValue)
             {
-                bgImg.color = midColor;
+                bgImg.color = bgColor;
                 fillImg.color = midColor;
             }
             else
             {
-                bgImg.color = maxColor;
+                bgImg.color = bgColor;
                 fillImg.color = maxColor;
             }
             isSliderColorDoneUpdating = true;
@@ -101,7 +102,7 @@ public class SliderHandler : MonoBehaviour
     }
 
     // ENCAPSULATION
-    public void SetDelegate(Deleagates.ObjectDelegate objectDelegate)
+    public void SetDelegate(Delegates.ObjectDelegate objectDelegate)
     {
         objDelegate = objectDelegate;
     }
@@ -136,10 +137,9 @@ public class SliderHandler : MonoBehaviour
     // ENCAPSULATION
     public bool IsSliderFull()
     {
-        return slider.value == fillToValue;
+        return slider.value == slider.maxValue;
     }
 
-    
 
     public void Show(bool show)
     {

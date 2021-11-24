@@ -140,7 +140,6 @@ public class SliderHandler : MonoBehaviour
         return slider.value == slider.maxValue;
     }
 
-
     public void Show(bool show)
     {
         slider.gameObject.SetActive(show);

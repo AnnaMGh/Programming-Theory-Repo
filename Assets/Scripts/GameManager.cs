@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     private List<int> plantlessCropIndexList;
     private List<int> plantedCropIndexList;
 
+    private int healthyPlants;
+    private int deadPlants;
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +31,7 @@ public class GameManager : MonoBehaviour
 
         //set crop list
         GameObject[] cropArrObj = GameObject.FindGameObjectsWithTag("Crop");
-        for (int i=0; i<cropArrObj.Length; i++)
+        for (int i = 0; i < cropArrObj.Length; i++)
         {
             GameObject obj = cropArrObj[i];
             obj.name = "Crop_" + i;
@@ -58,7 +61,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AddPlantToRandomCrop()
     {
-        while (true) {
+        while (true)
+        {
             float waitSeconds = Random.Range(2f, 5f);
             yield return new WaitForSeconds(waitSeconds);
 
@@ -71,23 +75,25 @@ public class GameManager : MonoBehaviour
             {
                 //choose random plantless crop index
                 int randomCropPositionIndex = Random.Range(0, plantlessCropIndexList.Count);
-              
-                //set random plant to crop
-                int randomPlantType = Random.Range(0, 3);
-                Transform cropPosition = cropList[plantlessCropIndexList[randomCropPositionIndex]].transform;
-                Plant plant = GetPlantByType(randomPlantType, cropPosition);
-                plant.Rename(plantlessCropIndexList[randomCropPositionIndex]);
-                cropList[plantlessCropIndexList[randomCropPositionIndex]].SetPlant(plant);
+                int cropIndex = plantlessCropIndexList[randomCropPositionIndex];
 
                 //update index list
                 plantedCropIndexList.Add(plantlessCropIndexList[randomCropPositionIndex]);
                 plantlessCropIndexList.RemoveAt(randomCropPositionIndex);
+
+                //set random plant to crop
+                int randomPlantType = Random.Range(0, 3);
+                Transform cropPosition = cropList[cropIndex].transform;
+                Plant plant = GetPlantByType(randomPlantType, cropPosition);
+                plant.Rename(cropIndex);
+                cropList[cropIndex].SetPlant(plant);
             }
         }
     }
 
     //ABSTRACTION
-    private void InitializeCropIndexList() {
+    private void InitializeCropIndexList()
+    {
         plantedCropIndexList = new List<int>();
         plantlessCropIndexList = new List<int>();
         for (int i = 0; i < cropList.Count; i++)
@@ -118,14 +124,15 @@ public class GameManager : MonoBehaviour
     }
 
     //ABSTRACTION
-    private void MoveToPositionAndFertilize(Ray raycast) {
+    private void MoveToPositionAndFertilize(Ray raycast)
+    {
         RaycastHit raycastHit;
         if (Physics.Raycast(raycast, out raycastHit))
         {
             GameObject obj = raycastHit.collider.gameObject;
             if (obj.tag.Equals("Plant") || obj.tag.Equals("Crop"))
             {
-                int index = int.Parse(obj.name.Substring(obj.name.IndexOf("_")+1));
+                int index = int.Parse(obj.name.Substring(obj.name.IndexOf("_") + 1));
                 Plant plant = cropList[index].GetPlant();
                 if (plant != null)
                 {
@@ -142,6 +149,28 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void DeclarePlantState(Plant.State state)
+    {
+        if (state.Equals(Plant.State.HEALTHY))
+        {
+            healthyPlants++;
+        }
+        else if (state.Equals(Plant.State.NEED_FERTILIZER))
+        {
+            healthyPlants--;
+        }
+        else
+        {
+            deadPlants++;
+        }
+
+        Debug.Log("Healthy: " + healthyPlants
+            + " | Need Fertilizer: " + (plantedCropIndexList.Count - (deadPlants + healthyPlants))
+            + " | Alive: " + (plantedCropIndexList.Count - deadPlants)
+            + " | Dead: " + deadPlants);
+           
     }
 }
 static class Extension

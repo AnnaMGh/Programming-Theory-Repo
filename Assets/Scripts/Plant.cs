@@ -13,6 +13,7 @@ public abstract class Plant : MonoBehaviour
     public Color[] stateColor { get; protected set; }
 
     protected SliderHandler sliderHandler;
+    protected GameManager gameManager;
     private Renderer objRenderer;
     private float stateLength;
 
@@ -25,6 +26,7 @@ public abstract class Plant : MonoBehaviour
         sliderHandler = sliderObj.GetComponent<SliderHandler>();
         objRenderer = this.GetComponent<Renderer>();
         stateLength = System.Enum.GetNames(typeof(State)).Length;
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         SetDelegate();
         SetStateColor();
@@ -117,18 +119,21 @@ public abstract class Plant : MonoBehaviour
         StopCoroutine(StartLife());
         StartCoroutine(ShowSlider(false, 1f));
         StartCoroutine(StartLife());
+        gameManager.DeclarePlantState(State.HEALTHY);
     }
 
     public virtual void AskForFertilizer()
     {
         sliderHandler.SetValue(sliderHandler.GetMinValue());
         StartCoroutine(ShowSlider(true, 0f));
+        gameManager.DeclarePlantState(State.NEED_FERTILIZER);
     }
 
     public virtual void Die()
     {
         sliderHandler.Show(false);
         StopCoroutine(StartLife());
+        gameManager.DeclarePlantState(State.DEAD);
     }
 
     //ABSTRACTION

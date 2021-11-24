@@ -1,10 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
+
     //inspector set
+    [SerializeField] TextMeshProUGUI txtAlive;
+    [SerializeField] TextMeshProUGUI txtTimer;
+    [SerializeField] TextMeshProUGUI txtNeedFertilizer;
+    [SerializeField] TextMeshProUGUI txtScore;
+    [SerializeField] GameObject panelStart;
+    [SerializeField] GameObject panelGame;
+    [SerializeField] GameObject panelFinish;
+
     private List<Crop> cropList = new List<Crop>();
 
     private PlayerHandler playerHandler;
@@ -16,6 +28,10 @@ public class GameManager : MonoBehaviour
     private int healthyPlants;
     private int deadPlants;
 
+    private readonly float timeStart = 2.5f * 60f;
+    private float timeLeft;
+
+    private bool isPlaying;
 
     // Start is called before the first frame update
     void Start()
@@ -41,21 +57,29 @@ public class GameManager : MonoBehaviour
         //set crop index list
         InitializeCropIndexList();
 
-        //spwan plants
-        StartCoroutine(AddPlantToRandomCrop());
+        //init IO
+        panelStart.SetActive(true);
+        panelGame.SetActive(false);
+        panelFinish.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (isPlaying)
         {
-            MoveToPosition(Camera.main.ScreenPointToRay(Input.mousePosition));
+            if (Input.GetMouseButton(0))
+            {
+                MoveToPosition(Camera.main.ScreenPointToRay(Input.mousePosition));
+            }
+            else if (Input.GetMouseButton(1))
+            {
+                MoveToPositionAndFertilize(Camera.main.ScreenPointToRay(Input.mousePosition));
+            }
+
+            
         }
-        else if (Input.GetMouseButton(1))
-        {
-            MoveToPositionAndFertilize(Camera.main.ScreenPointToRay(Input.mousePosition));
-        }
+        
     }
 
 
@@ -89,6 +113,36 @@ public class GameManager : MonoBehaviour
                 cropList[cropIndex].SetPlant(plant);
             }
         }
+    }
+
+
+    private IEnumerator CheckTimer()
+    {
+        timeLeft = timeStart;
+        while (isPlaying)
+        {
+            if (timeLeft <= 0)
+            {
+                isPlaying = false;
+                panelFinish.SetActive(true);
+                StopCoroutine(CheckTimer());
+            }
+
+            txtTimer.text = "| " + GetTimeLeft() + " |";
+
+            timeLeft--;
+
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    private string GetTimeLeft()
+    {
+        int min = (int)(timeLeft / 60);
+        int sec = (int)(timeLeft - (min * 60));
+
+        return min + " m " + sec + " s";
     }
 
     //ABSTRACTION
@@ -170,8 +224,35 @@ public class GameManager : MonoBehaviour
             + " | Need Fertilizer: " + (plantedCropIndexList.Count - (deadPlants + healthyPlants))
             + " | Alive: " + (plantedCropIndexList.Count - deadPlants)
             + " | Dead: " + deadPlants);
-           
+
+        txtAlive.SetText("ALIVE: " + (plantedCropIndexList.Count - deadPlants));
+        txtNeedFertilizer.SetText("NEED FERTILIZER: " + (plantedCropIndexList.Count - (deadPlants + healthyPlants)));
     }
+
+
+    #region Events
+
+    public void OnClickStart() {
+
+        isPlaying = true;
+        panelStart.SetActive(false);
+        panelGame.SetActive(true);
+
+        //start timer
+        StartCoroutine(CheckTimer());
+
+        //spwan plants
+        StartCoroutine(AddPlantToRandomCrop());
+    }
+
+    public void OnClickReplay()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
+    }
+
+
+    #endregion
 }
 static class Extension
 {

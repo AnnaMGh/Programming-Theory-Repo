@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI txtNeedFertilizer;
     [SerializeField] TextMeshProUGUI txtScore;
     [SerializeField] GameObject panelStart;
+    [SerializeField] GameObject panelInstructions;
     [SerializeField] GameObject panelGame;
     [SerializeField] GameObject panelFinish;
 
@@ -59,6 +60,7 @@ public class GameManager : MonoBehaviour
 
         //init IO
         panelStart.SetActive(true);
+        panelInstructions.SetActive(false);
         panelGame.SetActive(false);
         panelFinish.SetActive(false);
     }
@@ -125,6 +127,7 @@ public class GameManager : MonoBehaviour
             {
                 isPlaying = false;
                 panelFinish.SetActive(true);
+                txtScore.SetText("Score: " + (plantedCropIndexList.Count - deadPlants));
                 StopCoroutine(CheckTimer());
             }
 
@@ -243,6 +246,17 @@ public class GameManager : MonoBehaviour
 
         //spwan plants
         StartCoroutine(AddPlantToRandomCrop());
+    }
+
+    public void OnClickInstructions()
+    {
+        panelStart.SetActive(false);
+        panelInstructions.SetActive(true);
+    }
+    public void OnClickBack()
+    {
+        panelStart.SetActive(true);
+        panelInstructions.SetActive(false);
     }
 
     public void OnClickReplay()

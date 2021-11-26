@@ -19,6 +19,8 @@ public abstract class Plant : MonoBehaviour
 
     private Delegates.ObjectDelegate delegateObj;
 
+    private bool firstHealCalled = true;
+
 
     public void Awake()
     {
@@ -111,12 +113,21 @@ public abstract class Plant : MonoBehaviour
                 ChangeState(State.HEALTHY);
             }
         });
-       
+
     }
 
     protected virtual void Heal()
     {
-        StopCoroutine(StartLife());
+        if (firstHealCalled)
+        {
+            firstHealCalled = false;
+            StopCoroutine(StartLife());
+        }
+        else {
+            StopAllCoroutines();
+        }
+
+       
         StartCoroutine(ShowSlider(false, 1f));
         StartCoroutine(StartLife());
         gameManager.DeclarePlantState(State.HEALTHY);

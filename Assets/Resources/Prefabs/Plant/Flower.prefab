@@ -329,7 +329,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 8089226567597429171}
   m_FillRect: {fileID: 909250540768359316}
   m_HandleRect: {fileID: 6042462430311631039}
@@ -365,7 +365,7 @@ GameObject:
   - component: {fileID: 8372986313928278091}
   - component: {fileID: 6041057702295630977}
   - component: {fileID: 3738796737204507491}
-  - component: {fileID: 8706739916321234861}
+  - component: {fileID: 8775899395828499256}
   m_Layer: 6
   m_Name: Flower
   m_TagString: Plant
@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd9924ac3daa3c4f820c15be39e085a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &8706739916321234861
+--- !u!65 &8775899395828499256
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -457,11 +457,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5248621598622635348}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.3446264, z: 1}
-  m_Center: {x: 0, y: 0.6517935, z: -6.065637e-16}
+  m_Size: {x: 3, y: 1, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5513244806375415287
 GameObject:
   m_ObjectHideFlags: 0

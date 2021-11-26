@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI txtAlive;
     [SerializeField] TextMeshProUGUI txtTimer;
     [SerializeField] TextMeshProUGUI txtNeedFertilizer;
+    [SerializeField] TextMeshProUGUI txtTreesNr;
+    [SerializeField] TextMeshProUGUI txtBushesNr;
+    [SerializeField] TextMeshProUGUI txtFlowersNr;
     [SerializeField] TextMeshProUGUI txtScore;
     [SerializeField] GameObject panelStart;
     [SerializeField] GameObject panelInstructions;
@@ -58,7 +61,7 @@ public class GameManager : MonoBehaviour
         //set crop index list
         InitializeCropIndexList();
 
-        //init IO
+        //init UI
         panelStart.SetActive(true);
         panelInstructions.SetActive(false);
         panelGame.SetActive(false);
@@ -78,12 +81,9 @@ public class GameManager : MonoBehaviour
             {
                 MoveToPositionAndFertilize(Camera.main.ScreenPointToRay(Input.mousePosition));
             }
-
-            
         }
         
     }
-
 
     private IEnumerator AddPlantToRandomCrop()
     {
@@ -113,10 +113,11 @@ public class GameManager : MonoBehaviour
                 Plant plant = GetPlantByType(randomPlantType, cropPosition);
                 plant.Rename(cropIndex);
                 cropList[cropIndex].SetPlant(plant);
+
+                //Debug.Log(plantedCropIndexList.ListToString());
             }
         }
     }
-
 
     private IEnumerator CheckTimer()
     {
@@ -125,10 +126,7 @@ public class GameManager : MonoBehaviour
         {
             if (timeLeft <= 0)
             {
-                isPlaying = false;
-                panelFinish.SetActive(true);
-                txtScore.SetText("Score: " + (plantedCropIndexList.Count - deadPlants));
-                StopCoroutine(CheckTimer());
+                GameOver();
             }
 
             txtTimer.text = "| " + GetTimeLeft() + " |";
@@ -140,6 +138,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
     private string GetTimeLeft()
     {
         int min = (int)(timeLeft / 60);
@@ -195,7 +194,7 @@ public class GameManager : MonoBehaviour
                 {
                     if (playerHandler.ObjectCollided != null && playerHandler.ObjectCollided.name.EndsWith("_" + index))
                     {
-                        //if already near plant, just ferilize
+                        //if already near plant, just fertilize
                         playerHandler.Fetrilize(plant);
                     }
                     else
@@ -208,6 +207,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
+    private void GameOver()
+    {
+        isPlaying = false;
+        panelFinish.SetActive(true);
+
+        StopAllCoroutines();
+
+        int flowersAlive = 0;
+        int bushesAlive = 0;
+        int treesAlive = 0;
+
+        foreach (Crop c in cropList)
+        {
+            if (!c.GetPlant().state.Equals(Plant.State.DEAD))
+            {
+                c.GetPlant().StopAllCoroutines();
+                if (typeof(Flower).IsInstanceOfType(c.GetPlant()))
+                {
+                    flowersAlive++;
+                }
+                else if (typeof(Bush).IsInstanceOfType(c.GetPlant()))
+                {
+                    bushesAlive++;
+                }
+                else {
+                    treesAlive++;
+                }
+            }
+        }
+
+        txtTreesNr.text = treesAlive.ToString();
+        txtBushesNr.text = bushesAlive.ToString();
+        txtFlowersNr.text = flowersAlive.ToString();
+        txtScore.SetText("Score: " + (3*treesAlive + 2*bushesAlive + flowersAlive));
+    }
+
+    //ABSTRACTION & ENCAPSULATION
     public void DeclarePlantState(Plant.State state)
     {
         if (state.Equals(Plant.State.HEALTHY))
@@ -223,13 +260,8 @@ public class GameManager : MonoBehaviour
             deadPlants++;
         }
 
-        Debug.Log("Healthy: " + healthyPlants
-            + " | Need Fertilizer: " + (plantedCropIndexList.Count - (deadPlants + healthyPlants))
-            + " | Alive: " + (plantedCropIndexList.Count - deadPlants)
-            + " | Dead: " + deadPlants);
-
         txtAlive.SetText("ALIVE: " + (plantedCropIndexList.Count - deadPlants));
-        txtNeedFertilizer.SetText("NEED FERTILIZER: " + (plantedCropIndexList.Count - (deadPlants + healthyPlants)));
+        txtNeedFertilizer.SetText((plantedCropIndexList.Count - (deadPlants + healthyPlants)) + " :UNFERTILIZED");
     }
 
 

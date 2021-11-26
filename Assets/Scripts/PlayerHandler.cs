@@ -11,6 +11,8 @@ public class PlayerHandler : MonoBehaviour
     private const float accuracy = 0.5f;
     private bool isFertilizing;
     private Plant plantToFertilize;
+    private GameObject particles;
+    private AudioSource audio;
 
 
     private const float bound= 20;
@@ -22,6 +24,9 @@ public class PlayerHandler : MonoBehaviour
     void Start()
     {
         anim = GetComponent<Animator>();
+        particles = this.gameObject.transform.GetChild(5).gameObject;
+        particles.SetActive(false);
+        audio = this.gameObject.transform.GetChild(6).GetComponent<AudioSource>();
         newPosition = this.transform.position;
     }
 
@@ -58,12 +63,16 @@ public class PlayerHandler : MonoBehaviour
         {
             ObjectCollided = collider.gameObject;
         }
+        else if (collider.tag.Equals("Crop"))
+        {
+            ObjectCollided = collider.gameObject.GetComponent<Crop>().GetPlant().gameObject;
+        }
     }
 
     private void OnTriggerExit(Collider collider)
     {
         //save last plant collided
-        if (collider.tag.Equals("Plant"))
+        if (collider.tag.Equals("Plant") || collider.tag.Equals("Crop"))
         {
             ObjectCollided = null;
         }
@@ -116,6 +125,8 @@ public class PlayerHandler : MonoBehaviour
             isFertilizing = true;
             anim.SetBool("Crouch_b", isFertilizing);
             plant.Fertilize();
+            particles.SetActive(true);
+            audio.Play();
             Invoke("StopFertilize", 1f);
         }
     }
@@ -124,5 +135,8 @@ public class PlayerHandler : MonoBehaviour
         isFertilizing = false;
         plantToFertilize = null;
         anim.SetBool("Crouch_b", isFertilizing);
+        particles.SetActive(false);
+        audio.time = 0;
+        audio.Stop();
     }
 }

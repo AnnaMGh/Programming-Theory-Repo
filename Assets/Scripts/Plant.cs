@@ -77,6 +77,7 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
     public void Fertilize()
     {
         if (state.Equals(State.NEED_FERTILIZER))
@@ -85,9 +86,9 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
     private void SetDelegate()
     {
-
         delegateObj = (obj) =>
         {
             if ((bool)obj && state.Equals(State.NEED_FERTILIZER))
@@ -98,11 +99,14 @@ public abstract class Plant : MonoBehaviour
 
         sliderHandler.SetDelegate(delegateObj);
     }
+
+    //ABSTRACTION & INHERITANCE & POLYMORPHISM
     protected virtual void SetStateColor()
     {
         stateColor = new Color[3] { Color.white, Color.yellow, Color.black };
     }
 
+    //ABSTRACTION & INHERITANCE & POLYMORPHISM
     protected virtual void SetFertilizerNeed()
     {
         sliderHandler.SetSlider(0, 1);
@@ -116,7 +120,8 @@ public abstract class Plant : MonoBehaviour
 
     }
 
-    protected virtual void Heal()
+    //ABSTRACTION & INHERITANCE
+    protected void Heal()
     {
         if (firstHealCalled)
         {
@@ -133,14 +138,16 @@ public abstract class Plant : MonoBehaviour
         gameManager.DeclarePlantState(State.HEALTHY);
     }
 
-    public virtual void AskForFertilizer()
+    //ABSTRACTION & INHERITANCE 
+    public void AskForFertilizer()
     {
         sliderHandler.SetValue(sliderHandler.GetMinValue());
         StartCoroutine(ShowSlider(true, 0f));
         gameManager.DeclarePlantState(State.NEED_FERTILIZER);
     }
 
-    public virtual void Die()
+    //ABSTRACTION & INHERITANCE
+    public void Die()
     {
         sliderHandler.Show(false);
         StopCoroutine(StartLife());

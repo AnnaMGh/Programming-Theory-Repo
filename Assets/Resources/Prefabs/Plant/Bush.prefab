@@ -229,7 +229,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 358467211503962783}
   m_FillRect: {fileID: 530826105644787839}
   m_HandleRect: {fileID: 3502485873082289068}
@@ -265,7 +265,7 @@ GameObject:
   - component: {fileID: 8372986313928278091}
   - component: {fileID: 6041057702295630977}
   - component: {fileID: 4335055791865016727}
-  - component: {fileID: 522052272959300502}
+  - component: {fileID: 4132090306706392804}
   m_Layer: 6
   m_Name: Bush
   m_TagString: Plant
@@ -349,7 +349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b52bb158db3f349a1d0e1707fa7d6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &522052272959300502
+--- !u!65 &4132090306706392804
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -357,11 +357,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5248621598622635348}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.641244, y: 3.019382, z: 1.5713849}
-  m_Center: {x: -0.0055048466, y: 1.5033047, z: 0.03864622}
+  m_Size: {x: 4, y: 1, z: 4}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6431150694618471148
 GameObject:
   m_ObjectHideFlags: 0

@@ -308,8 +308,8 @@ GameObject:
   - component: {fileID: 4872060428565876718}
   - component: {fileID: 8372986313928278091}
   - component: {fileID: 6041057702295630977}
-  - component: {fileID: 8706739916321234861}
   - component: {fileID: 7803769550993065775}
+  - component: {fileID: 5877115232764827246}
   m_Layer: 6
   m_Name: Tree
   m_TagString: Plant
@@ -381,19 +381,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8706739916321234861
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5248621598622635348}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.3117101, y: 2.4026945, z: 1}
-  m_Center: {x: 0.031170964, y: 1.1689125, z: 1.1510339e-15}
 --- !u!114 &7803769550993065775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,6 +393,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 369700693d3147b4fb9e71e6e582813e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &5877115232764827246
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5248621598622635348}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3, y: 1, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8253087798922000468
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,7 +585,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 8433887268247736475}
   m_FillRect: {fileID: 2855726178048955499}
   m_HandleRect: {fileID: 7449391362302874655}
